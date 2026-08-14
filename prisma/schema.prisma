@@ -14,67 +14,66 @@ datasource db {
 
 // Creating Database schema
 
-  //User model
+//User model
 
 enum Role {
-    USER
-    ADMIN
-  }
+  USER
+  ADMIN
+}
 
 enum OrderStatus {
-    PENDING
-    PROCESSING
-    SHIPPED
-    DELIVERED
-    CANCELLED
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }
 
 enum PaymentStatus {
-    PENDING
-    COMPLETED
-    FAILED
+  PENDING
+  COMPLETED
+  FAILED
 }
+
 model User {
-    id String @id @default(uuid())
-    email String @unique
-    password String 
-    firstName String?
-    lastName String?
-    role Role @default(USER)
-    refreshToken String?
+  id           String  @id @default(uuid())
+  email        String  @unique
+  password     String
+  firstName    String?
+  lastName     String?
+  role         Role    @default(USER)
+  refreshToken String?
 
+  // Relations
+  orders   Order[]
+  carts    Cart[]
+  payments Payment[]
 
-    // Relations
-    orders Order[]
-    carts Cart[]
-    payments Payment[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    @@index([email], name: "email_index")
-    @@map("users") // the name of the table in the database will be "users"
-
+  @@index([email], name: "email_index")
+  @@map("users") // the name of the table in the database will be "users"
 }
 
-model Product{
-  id String @id @default(uuid())
-  name String
+model Product {
+  id          String  @id @default(uuid())
+  name        String
   description String?
-  price Decimal @db.Decimal(10, 2)
-  stock Int @default(0)
-  sku String @unique
-  imageUrl String?
-  isActive Boolean @default(true)
+  price       Decimal @db.Decimal(10, 2)
+  stock       Int     @default(0)
+  sku         String  @unique
+  imageUrl    String?
+  isActive    Boolean @default(true)
 
   // Relations
   orderItems OrderItem[]
-  cartItems CartItem[]
+  cartItems  CartItem[]
 
   categoryId String
-  category Category @relation(fields: [categoryId], references: [id], onDelete:Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@index([sku])
   @@index([categoryId])
@@ -82,13 +81,13 @@ model Product{
   @@map("products") // the name of the table in the database will be "products"
 }
 
-model Category{
-  id String @id @default(uuid())
-  name String 
+model Category {
+  id          String  @id @default(uuid())
+  name        String
   description String?
-  slug String @unique
-  imageUrl String?
-  isActive Boolean @default(true)
+  slug        String  @unique
+  imageUrl    String?
+  isActive    Boolean @default(true)
 
   // Relations
   products Product[]
@@ -101,15 +100,15 @@ model Category{
   @@map("categories") // the name of the table in the database will be "categories"
 }
 
-model CartItem{
-  id String @id @default(uuid())
-  quantity Int @default(1)
+model CartItem {
+  id        String  @id @default(uuid())
+  quantity  Int     @default(1)
   productId String
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   cartId String
-  cart Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  
+  cart   Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -119,15 +118,15 @@ model CartItem{
   @@map("cart_items") // the name of the table in the database will be "
 }
 
-model OrderItem{
-  id String @id @default(uuid())
-  quantity Int
-  price Decimal @db.Decimal(10, 2)
+model OrderItem {
+  id        String  @id @default(uuid())
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
   productId String
-  product Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
 
   orderId String
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -135,24 +134,24 @@ model OrderItem{
   @@index([productId])
   @@index([orderId])
   @@map("order_items") // the name of the table in the database will be "order_items"
-
 }
-model Order{
-  id String @id @default(uuid())
-  orderNumber String @unique @default(cuid())
-  status OrderStatus 
-  totalAmount Decimal @db.Decimal(10,2)
+
+model Order {
+  id          String      @id @default(uuid())
+  orderNumber String      @unique @default(cuid())
+  status      OrderStatus
+  totalAmount Decimal     @db.Decimal(10, 2)
 
   userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   cartId String
-  cart Cart @relation(fields: [cartId], references: [id])
+  cart   Cart   @relation(fields: [cartId], references: [id])
 
   shippingAddress String?
 
   orderItems OrderItem[]
-  payment Payment?
+  payment    Payment?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -161,15 +160,14 @@ model Order{
   @@index([orderNumber])
   @@index([status])
   @@map("orders") // the name of the table in the database will be "orders"
-
 }
 
-model Cart{
-  id String @id @default(uuid())
+model Cart {
+  id     String @id @default(uuid())
   userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  orders Order[]
+  orders     Order[]
   checkedOut Boolean @default(false)
 
   cartItems CartItem[]
@@ -181,19 +179,19 @@ model Cart{
   @@map("carts") // the name of the table in the database will be "
 }
 
-model Payment{
-  id String @id @default(uuid())
-  amount Decimal @db.Decimal(10, 2)
-  status PaymentStatus @default(PENDING)
-  currency String @default("usd")
-  paymentMethod String? 
+model Payment {
+  id            String        @id @default(uuid())
+  amount        Decimal       @db.Decimal(10, 2)
+  status        PaymentStatus @default(PENDING)
+  currency      String        @default("usd")
+  paymentMethod String?
   transactionId String?
 
   orderId String @unique
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
