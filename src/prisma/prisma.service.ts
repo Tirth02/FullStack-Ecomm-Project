@@ -31,6 +31,15 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
         }
 
         const models = Reflect.ownKeys(this).filter((key) => typeof key === 'string' && !key.startsWith('_'));
-        
+
+        return Promise.all(
+            models.map((modelKey) => {
+            if(typeof modelKey === 'string')
+            {
+                return this[modelKey].deleteMany;
+            }
+        }
+            )
+        )
     }
 }
